@@ -19,6 +19,15 @@ async function scrapeTwitterAccount(url, ticker) {
     // Navigate to the specified URL and wait until the network is idle
     await page.goto(url, { waitUntil: "networkidle2" });
 
+    try {
+      // Wait for the tweets to load
+      await page.waitForSelector("article div[lang]", { timeout: 10000 });
+    } catch (error) {
+      // Log a message and return 0 mentions if timeout occurs
+      console.log(`Timeout waiting for tweets on ${url}`);
+      return 0;
+    }
+
     // Extract tweets from the page
     const tweets = await page.evaluate(() => {
       // Get all tweet elements and extract their inner text
